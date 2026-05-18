@@ -1,0 +1,193 @@
+// ============================================================
+//  SWAPIFY — Règles de sécurité Firestore
+//  Dernière mise à jour : 15 mai 2026
+//  Conformes à : Loi 25 (Québec), LPRPDE, bonnes pratiques Firebase
+// ============================================================
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ── Fonctions utilitaires ────────────────────────────────────────────────
+
+    // L'utilisateur est authentifié
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+
+    // L'utilisateur accède à ses propres données
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+
+    // Vérifie qu'un champ existe et est non vide
+    function hasField(field) {
+      return field in request.resource.data && request.resource.data[field] != null;
+    }
+
+    // Vérifie qu'une chaîne respecte une longueur maximale
+    function maxLength(value, max) {
+      return value is string && value.size() <= max;
+    }
+
+    // Vérifie qu'une liste ne dépasse pas un nombre maximum d'éléments
+    function listMaxSize(field, max) {
+      return !(field in request.resource.data) ||
+             request.resource.data[field].size() <= max;
+    }
+
+    // ── Collection : utilisateurs (/users/{userId}) ──────────────────────────
+    match /users/{userId} {
+
+      // Lecture : tout utilisateur authentifié peut voir les profils publics
+      allow read: if isAuthenticated();
+
+      // Création : uniquement par le propriétaire, avec validation des données
+      allow create: if isOwner(userId)
+        && hasField('name')
+        && maxLength(request.resource.data.name, 60)
+        && hasField('email')
+        && maxLength(request.resource.data.email, 254)
+        // Empêche la manipulation du solde temps à la création
+        && (!('timeBalance' in request.resource.data) || request.resource.data.timeBalance == 0)
+        && (!('rating' in request.resource.data) || request.resource.data.rating == 0)
+        && (!('isVerified' in request.resource.data) || request.resource.data.isVerified == false)
+        // Limite les listes de compétences
+        && listMaxSize('skillsOffered', 20)
+        && listMaxSize('skillsWanted', 20);
+
+      // Mise à jour : uniquement par le propriétaire
+      allow update: if isOwner(userId)
+        // Champs protégés : l'utilisateur ne peut pas manipuler sa note ou vérification
+        && (!('isVerified' in request.resource.data) || resource.data.isVerified == request.resource.data.isVerified)
+        && (!('rating' in request.resource.data) || resource.data.rating == request.resource.data.rating)
+        && (!('reviewCount' in request.resource.data) || resource.data.reviewCount == request.resource.data.reviewCount)
+        && (!('email' in request.resource.data) || resource.data.email == request.resource.data.email)
+        // Validation des champs modifiables
+        && (!('name' in request.resource.data) || maxLength(request.resource.data.name, 60))
+        && (!('bio' in request.resource.data) || maxLength(request.resource.data.bio, 500))
+        && (!('city' in request.resource.data) || maxLength(request.resource.data.city, 100))
+        // Limite les listes de compétences
+        && listMaxSize('skillsOffered', 20)
+        && listMaxSize('skillsWanted', 20);
+
+      // Suppression : uniquement par le propriétaire
+      allow delete: if isOwner(userId);
+    }
+
+    // ── Collection : échanges (/exchanges/{exchangeId}) ──────────────────────
+    match /exchanges/{exchangeId} {
+
+      // Lecture : uniquement les participants à l'échange
+      allow read: if isAuthenticated() && (
+        request.auth.uid == resource.data.requesterId ||
+        request.auth.uid == resource.data.providerId
+      );
+
+      // Création : uniquement le demandeur (requesterId doit correspondre à l'utilisateur)
+      allow create: if isAuthenticated()
+        && request.auth.uid == request.resource.data.requesterId
+        && hasField('requesterId')
+        && hasField('providerId')
+        && hasField('skillOffered')
+        && hasField('skillWanted')
+        && maxLength(request.resource.data.skillOffered, 100)
+        && maxLength(request.resource.data.skillWanted, 100)
+        // Empêche la création avec un statut autre que 'pending'
+        && request.resource.data.status == 'pending'
+        // Empêche de s'envoyer un échange à soi-même
+        && request.resource.data.requesterId != request.resource.data.providerId;
+
+      // Mise à jour : uniquement les participants, avec règles strictes
+      allow update: if isAuthenticated() && (
+          request.auth.uid == resource.data.requesterId ||
+          request.auth.uid == resource.data.providerId
+        )
+        // Empêche de changer les participants
+        && resource.data.requesterId == request.resource.data.requesterId
+        && resource.data.providerId == request.resource.data.providerId
+        // Seul le statut et les champs permis peuvent changer
+        && (!('status' in request.resource.data) || request.resource.data.status in ['pending', 'accepted', 'declined', 'completed']);
+
+      // Suppression : non autorisée (pour conserver l'historique et les preuves)
+      allow delete: if false;
+
+      // ── Sous-collection : messages (/exchanges/{exchangeId}/messages/{messageId}) ──
+      match /messages/{messageId} {
+
+        // Lecture : uniquement les participants à l'échange parent
+        allow read: if isAuthenticated() && (
+          request.auth.uid == get(/databases/$(database)/documents/exchanges/$(exchangeId)).data.requesterId ||
+          request.auth.uid == get(/databases/$(database)/documents/exchanges/$(exchangeId)).data.providerId
+        );
+
+        // Création : uniquement les participants, avec validation
+        allow create: if isAuthenticated()
+          && (
+            request.auth.uid == get(/databases/$(database)/documents/exchanges/$(exchangeId)).data.requesterId ||
+            request.auth.uid == get(/databases/$(database)/documents/exchanges/$(exchangeId)).data.providerId
+          )
+          && request.auth.uid == request.resource.data.senderId
+          && hasField('text')
+          && maxLength(request.resource.data.text, 2000)
+          && hasField('senderId');
+
+        // Modification et suppression : interdites (intégrité des messages)
+        allow update, delete: if false;
+      }
+    }
+
+    // ── Collection : avis (/reviews/{reviewId}) ───────────────────────────────
+    match /reviews/{reviewId} {
+
+      // Lecture : tout utilisateur authentifié peut lire les avis
+      allow read: if isAuthenticated();
+
+      // Création : uniquement si l'auteur correspond à l'utilisateur authentifié
+      allow create: if isAuthenticated()
+        && request.auth.uid == request.resource.data.fromUserId
+        && hasField('toUserId')
+        && hasField('fromUserId')
+        && hasField('rating')
+        && request.resource.data.rating >= 1
+        && request.resource.data.rating <= 5
+        && (!('comment' in request.resource.data) || maxLength(request.resource.data.comment, 500))
+        // Un utilisateur ne peut pas se noter lui-même
+        && request.resource.data.fromUserId != request.resource.data.toUserId;
+
+      // Modification et suppression : interdites (intégrité des avis)
+      allow update, delete: if false;
+    }
+
+    // ── Collection : signalements (/reports/{reportId}) ───────────────────────
+    match /reports/{reportId} {
+
+      // Lecture : réservée aux administrateurs uniquement
+      allow read: if false;
+
+      // Création : tout utilisateur authentifié peut signaler
+      allow create: if isAuthenticated()
+        && request.auth.uid == request.resource.data.reporterId
+        && hasField('reportedUserId')
+        && hasField('reason')
+        && maxLength(request.resource.data.reason, 200)
+        // Un utilisateur ne peut pas se signaler lui-même
+        && request.resource.data.reporterId != request.resource.data.reportedUserId;
+
+      // Modification et suppression : interdites
+      allow update, delete: if false;
+    }
+
+    // ── Collection : favoris (/favorites/{userId}) ────────────────────────────
+    match /favorites/{userId} {
+      allow read:   if isOwner(userId);
+      allow write:  if isOwner(userId);
+      allow delete: if isOwner(userId);
+    }
+
+    // ── Refus par défaut : toute collection non listée est bloquée ────────────
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
