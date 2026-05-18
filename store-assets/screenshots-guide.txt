@@ -1,0 +1,111 @@
+═══════════════════════════════════════
+SWAPIFY — Guide Screenshots App Store
+═══════════════════════════════════════
+
+TAILLE REQUISE (iPhone) :
+• iPhone 6.9" (iPhone 15 Pro Max) : 1320 × 2868 px  ← OBLIGATOIRE
+• iPhone 6.5" (iPhone 14 Plus)    : 1242 × 2778 px  ← recommandé
+• iPad 12.9"                      : 2048 × 2732 px  ← si supportsTablet: true
+
+TAILLE REQUISE (Android - Google Play) :
+• 1080 × 1920 px minimum (portrait)
+• Max 8 screenshots
+
+FORMAT : PNG ou JPEG, RGB, pas de transparence
+
+═══════════════════════════════════════
+LES 5 SCREENSHOTS À PRENDRE
+(dans cet ordre pour l'App Store)
+═══════════════════════════════════════
+
+📸 SCREENSHOT 1 — Accueil / Découverte
+   Écran : HomeScreen (liste des utilisateurs)
+   Montre : Profils de membres avec compétences variées
+   Texte à superposer : "Découvre des talents près de chez toi"
+
+📸 SCREENSHOT 2 — Profil utilisateur
+   Écran : Profil d'un autre utilisateur (UserProfileScreen)
+   Montre : Photo, compétences, avis, bouton "Proposer un échange"
+   Texte à superposer : "Connecte-toi avec ta communauté"
+
+📸 SCREENSHOT 3 — Messagerie
+   Écran : ConversationScreen / MessagesScreen
+   Montre : Une conversation active entre 2 membres
+   Texte à superposer : "Discute et planifie en toute sécurité"
+
+📸 SCREENSHOT 4 — Mon profil / Solde Temps
+   Écran : ProfileScreen (ton propre profil)
+   Montre : Solde d'heures, compétences ajoutées, badge
+   Texte à superposer : "Accumule des heures, apprends sans payer"
+
+📸 SCREENSHOT 5 — Carte interactive
+   Écran : MapScreen (si disponible) ou ExploreScreen
+   Montre : Carte avec membres autour
+   Texte à superposer : "Trouve des talents dans ton quartier"
+
+═══════════════════════════════════════
+COMMENT PRENDRE LES SCREENSHOTS
+═══════════════════════════════════════
+
+OPTION A — Sur ton iPhone (TestFlight) :
+1. Lance l'app via TestFlight
+2. Navigue vers l'écran voulu
+3. Appuie simultanément sur :
+   • iPhone avec Face ID : Bouton latéral + Volume Haut
+   • iPhone avec Touch ID : Bouton Home + Bouton veille
+4. La photo est sauvegardée dans Photos
+
+OPTION B — Simulateur iOS (Xcode) :
+1. Lance le simulateur iPhone 15 Pro Max
+2. Lance l'app : npx expo start --clear
+3. Dans le menu Simulateur : File → Screenshot
+   Ou raccourci : Cmd + S
+4. Les screenshots sont au format PNG 1290×2796
+
+OPTION C — Expo Go (développement) :
+1. npx expo start --tunnel
+2. Ouvre sur iPhone
+3. Prends les screenshots normalement
+
+═══════════════════════════════════════
+AJOUTER DU TEXTE SUR LES SCREENSHOTS
+═══════════════════════════════════════
+
+Outils gratuits en ligne :
+• https://www.appscreenshot.design/
+• https://screenshots.pro/
+• https://previewed.app/
+
+Ou utilise Canva (gratuit) :
+1. Nouveau design → taille personnalisée → 1242 × 2778
+2. Importe le screenshot comme fond
+3. Ajoute le texte en blanc en haut ou en bas
+4. Fond de couleur semi-transparent : #040F1E à 80% opacité
+
+POLICE RECOMMANDÉE : System / SF Pro (iOS) ou Poppins (Google Fonts)
+COULEURS DE TEXTE : #E0F2FE (blanc) et #0EA5E9 (bleu Swapify)
+
+═══════════════════════════════════════
+UPLOADER SUR APP STORE CONNECT
+═══════════════════════════════════════
+
+1. Va sur https://appstoreconnect.apple.com
+2. Mon App → Swapify → Distribution iOS
+3. Captures d'écran de l'App
+4. Glisse-dépose les 5 images (6.9" d'abord)
+5. Sauvegarde
+
+═══════════════════════════════════════
+DONNÉES DE TEST À CRÉER AVANT LES SCREENSHOTS
+═══════════════════════════════════════
+
+Pour avoir de beaux screenshots, crée 2-3 faux profils avec :
+• Compétences variées (guitare, yoga, Python...)
+• Photo de profil (peut être une image libre de droits)
+• Quelques avis (4-5 étoiles)
+• Un échange simulé dans la messagerie
+
+Sites pour photos de profil libres de droits :
+• https://randomuser.me/ (générateur de faux profils)
+• https://unsplash.com/
+• https://this-person-does-not-exist.com/ (visages IA)

@@ -1,0 +1,93 @@
+═══════════════════════════════════════
+SWAPIFY — App Store Description (English)
+═══════════════════════════════════════
+
+TITLE (30 chars max) :
+Swapify — Skill Exchange
+
+SUBTITLE (30 chars max) :
+Trade your talents, for free
+
+═══════════════════════════════════════
+SHORT DESCRIPTION (170 characters) :
+═══════════════════════════════════════
+Exchange skills with your community. 1 hour of service = 1 hour of credit. Free, no money, between neighbours.
+
+═══════════════════════════════════════
+LONG DESCRIPTION (4000 characters max) :
+═══════════════════════════════════════
+🔄 SWAPIFY — Trade your talents, enrich your life
+
+Can you cook? Play guitar? Code? Do yoga?
+Someone near you wants to learn exactly what you know how to do.
+
+Swapify connects people who want to exchange skills — without money. It's simple: you offer 1 hour of your time, you get 1 hour back. We call it timebanking.
+
+─────────────────────────────
+🌟 HOW DOES IT WORK?
+─────────────────────────────
+1. Create your profile and add your skills
+2. Discover members near you
+3. Propose an exchange in seconds
+4. Chat, plan and complete the exchange
+5. Rate each other and earn time credits!
+
+─────────────────────────────
+✨ WHAT YOU CAN EXCHANGE
+─────────────────────────────
+🎸 Music — Guitar, piano, singing, drums
+💻 Tech — Python, web dev, Excel, video editing
+🧘 Sport & Wellness — Yoga, fitness, meditation
+🍳 Cooking — Baking, world cuisine, nutrition
+🌍 Languages — English, Spanish, Arabic, Mandarin
+🎨 Art & Creativity — Drawing, photography, design
+📚 Education — Math, physics, tutoring
+🏡 Home — Gardening, DIY, electrical work
+💼 Business — Accounting, marketing, finance
+
+─────────────────────────────
+🔐 SECURE AND RELIABLE
+─────────────────────────────
+• Verifiable profiles with badge system
+• Authentic ratings and reviews after each exchange
+• Integrated secure messaging
+• Easy reporting of inappropriate behaviour
+• Data protected under Quebec Law 25 and PIPEDA
+
+─────────────────────────────
+💚 WHY SWAPIFY?
+─────────────────────────────
+• 100% FREE — forever, no hidden subscription
+• Strengthens the bonds in your community
+• Learn something new every week
+• Value your skills beyond money
+• Join a caring and supportive community
+
+─────────────────────────────
+🏆 YOUR BENEFITS
+─────────────────────────────
+• Time Balance: accumulate hours to spend whenever you want
+• Online Status: see who is available right now
+• Interactive Map: find members near you
+• Real-time notifications for your exchanges
+
+Swapify is the sharing economy at its best.
+Download for free and make your first exchange today! 🚀
+
+─────────────────────────────
+📩 Contact: support@swapify.app
+🔒 Privacy Policy: https://contactcyberz.github.io/Swapify/privacy
+─────────────────────────────
+
+═══════════════════════════════════════
+KEYWORDS (100 characters max) :
+═══════════════════════════════════════
+skill,swap,exchange,timebank,community,free,share,talents,learning,neighbours,barter,trade
+
+═══════════════════════════════════════
+PRIMARY CATEGORY: Social Networking
+SECONDARY CATEGORY: Lifestyle
+═══════════════════════════════════════
+
+AGE RATING: 12+
+(Unfiltered user-generated content — messaging between users)
