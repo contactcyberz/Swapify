@@ -26,7 +26,7 @@ export const ProfileScreen = ({ navigation }: any) => {
   const [skillsWanted, setSkillsWanted] = useState<string[]>([]);
   const [avatar, setAvatar] = useState('🧑');
   const [photoUri, setPhotoUri] = useState<string | null>(null);
-
+{ icon: 'help-circle-outline', label: 'Aide & Support', color: Colors.textSecondary, onPress: () => navigation.navigate('Help') },
   // Modal state
   const [modalVisible, setModalVisible] = useState(false);
   const [modalType, setModalType] = useState<'offered' | 'wanted'>('offered');
@@ -140,6 +140,43 @@ export const ProfileScreen = ({ navigation }: any) => {
       { text: 'Déconnexion', style: 'destructive', onPress: logoutUser },
     ]);
   };
+  const handleDeleteAccount = () => {
+  Alert.alert(
+    'Supprimer mon compte',
+    'Cette action est irréversible. Toutes tes données seront supprimées définitivement.',
+    [
+      { text: 'Annuler', style: 'cancel' },
+      {
+        text: 'Supprimer',
+        style: 'destructive',
+        onPress: async () => {
+          Alert.alert(
+            'Confirmer la suppression',
+            'Es-tu vraiment sûr(e) ? Ton compte et toutes tes données seront perdus.',
+            [
+              { text: 'Annuler', style: 'cancel' },
+              {
+                text: 'Oui, supprimer',
+                style: 'destructive',
+                onPress: async () => {
+                  try {
+                    if (user?.uid) {
+                      const { deleteDoc, doc: firestoreDoc } = await import('firebase/firestore');
+                      await deleteDoc(firestoreDoc(db, 'users', user.uid));
+                    }
+                    await logoutUser();
+                  } catch (e) {
+                    Alert.alert('Erreur', 'Impossible de supprimer le compte. Réessaie plus tard.');
+                  }
+                },
+              },
+            ]
+          );
+        },
+      },
+    ]
+  );
+};
 
   const QUICK_SKILLS_OFFERED = ['Python', 'Guitare', 'Yoga', 'Anglais', 'Cuisine', 'Photo', 'Dessin', 'Excel'];
   const QUICK_SKILLS_WANTED = ['Espagnol', 'Piano', 'Jardinage', 'Comptabilité', 'Montage vidéo', 'Musculation'];
@@ -271,6 +308,7 @@ export const ProfileScreen = ({ navigation }: any) => {
             { icon: 'share-outline', label: 'Partager mon profil', color: Colors.primary, onPress: () => Share.share({ message: `Je suis sur Swapify ! Je peux t'enseigner des compétences et apprendre de toi. Rejoins-moi : https://swapify.app`, title: 'Swapify' }) },
             { icon: 'shield-checkmark-outline', label: 'Vérifier mon compte', color: Colors.accent, onPress: () => navigation.navigate('VerifyAccount') },
             { icon: 'help-circle-outline', label: 'Aide & Support', color: Colors.textSecondary, onPress: () => navigation.navigate('Help') },
+      { icon: 'trash-outline', label: 'Supprimer mon compte', color: Colors.error, onPress: handleDeleteAccount },
           ].map((item, i, arr) => (
             <TouchableOpacity
               key={i}
