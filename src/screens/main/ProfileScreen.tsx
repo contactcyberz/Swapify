@@ -51,10 +51,13 @@ export const ProfileScreen = ({ navigation }: any) => {
 
   const pickPhoto = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-    if (status !== 'granted') {
-      Alert.alert('Permission requise', 'Autorise l\'accès à tes photos dans les réglages.');
-      return;
-    }
+    if (status !== 'granted' && status !== 'limited') {
+  Alert.alert('Permission requise', 'Autorise l\'accès à tes photos dans les réglages.', [
+    { text: 'Annuler', style: 'cancel' },
+    { text: 'Ouvrir les réglages', onPress: () => ImagePicker.requestMediaLibraryPermissionsAsync() },
+  ]);
+  return;
+}
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Images,
       allowsEditing: true,
