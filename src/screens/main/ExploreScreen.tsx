@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {
   View, Text, StyleSheet, TextInput, FlatList,
-  TouchableOpacity, ActivityIndicator,
+  TouchableOpacity, ActivityIndicator, Alert,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -134,9 +134,18 @@ export const ExploreScreen = ({ navigation }: any) => {
                             </Text>
                           )}
                         </View>
-                        <View style={styles.proposeBtn}>
-                          <Text style={styles.proposeBtnText}>Échanger</Text>
-                        </View>
+                       <View style={{ alignItems: 'center', gap: 6 }}>
+  <View style={styles.proposeBtn}>
+    <Text style={styles.proposeBtnText}>Échanger</Text>
+  </View>
+  <TouchableOpacity onPress={() => Alert.alert('Signaler / Bloquer', `Que veux-tu faire avec ${item.name} ?`, [
+    { text: 'Annuler', style: 'cancel' },
+    { text: '🚩 Signaler', onPress: () => Alert.alert('Signalé', 'Merci, nous allons examiner ce profil sous 24h.') },
+    { text: '🚫 Bloquer', style: 'destructive', onPress: () => Alert.alert('Bloqué', `${item.name} a été bloqué.`) },
+  ])}>
+    <Text style={{ color: Colors.textMuted, fontSize: 11 }}>Signaler</Text>
+  </TouchableOpacity>
+</View>
                       </TouchableOpacity>
                     ))
                   )}
@@ -186,9 +195,18 @@ export const ExploreScreen = ({ navigation }: any) => {
                           <Text style={styles.memberRating}>⭐ {item.rating}</Text>
                         )}
                       </View>
-                      <View style={styles.proposeBtn}>
-                        <Text style={styles.proposeBtnText}>Échanger</Text>
-                      </View>
+                      <View style={{ alignItems: 'center', gap: 6 }}>
+  <View style={styles.proposeBtn}>
+    <Text style={styles.proposeBtnText}>Échanger</Text>
+  </View>
+  <TouchableOpacity onPress={() => Alert.alert('Signaler / Bloquer', `Que veux-tu faire avec ${item.name} ?`, [
+    { text: 'Annuler', style: 'cancel' },
+    { text: '🚩 Signaler', onPress: () => Alert.alert('Signalé', 'Merci, nous allons examiner ce profil sous 24h.') },
+    { text: '🚫 Bloquer', style: 'destructive', onPress: () => Alert.alert('Bloqué', `${item.name} a été bloqué.`) },
+  ])}>
+    <Text style={{ color: Colors.textMuted, fontSize: 11 }}>Signaler</Text>
+  </TouchableOpacity>
+</View>
                     </TouchableOpacity>
                   ))}
                 </>
