@@ -26,7 +26,7 @@ export const ProfileScreen = ({ navigation }: any) => {
   const [skillsWanted, setSkillsWanted] = useState<string[]>([]);
   const [avatar, setAvatar] = useState('🧑');
   const [photoUri, setPhotoUri] = useState<string | null>(null);
-{ icon: 'help-circle-outline', label: 'Aide & Support', color: Colors.textSecondary, onPress: () => navigation.navigate('Help') },
+
   // Modal state
   const [modalVisible, setModalVisible] = useState(false);
   const [modalType, setModalType] = useState<'offered' | 'wanted'>('offered');
