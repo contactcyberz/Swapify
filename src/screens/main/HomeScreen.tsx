@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View, Text, StyleSheet, ScrollView, TouchableOpacity,
-  FlatList, ActivityIndicator, RefreshControl,
+  FlatList, ActivityIndicator, RefreshControl, TextInput, Animated,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -11,6 +11,7 @@ import { useAuth } from '../../hooks/useAuth';
 import { getNearbyUsers, seedDemoUsers } from '../../services/users';
 import { toggleFavorite, getFavorites } from '../../services/favorites';
 import { updatePresence, isUserOnline } from '../../services/presence';
+import { getUserProfile } from '../../services/auth';
 import { Share } from 'react-native';
 
 export const HomeScreen = ({ navigation }: any) => {
@@ -20,6 +21,9 @@ export const HomeScreen = ({ navigation }: any) => {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [favorites, setFavorites] = useState<string[]>([]);
+  const [search, setSearch] = useState('');
+  const [timeBalance, setTimeBalance] = useState(0);
+  const fadeAnim = useRef(new Animated.Value(0)).current;
 
   const firstName = user?.displayName?.split(' ')[0] || 'toi';
 
@@ -27,13 +31,16 @@ export const HomeScreen = ({ navigation }: any) => {
     if (!user?.uid) return;
     try {
       await seedDemoUsers();
-      const [result, favs] = await Promise.all([
+      const [result, favs, profile] = await Promise.all([
         getNearbyUsers(user.uid),
         getFavorites(user.uid),
+        getUserProfile(user.uid),
       ]);
       setUsers(result);
       setFavorites(favs);
+      if (profile?.timeBalance) setTimeBalance(profile.timeBalance);
       updatePresence(user.uid);
+      Animated.timing(fadeAnim, { toValue: 1, duration: 400, useNativeDriver: true }).start();
     } catch (e) {
       console.log('loadUsers error:', e);
     } finally {
@@ -52,32 +59,26 @@ export const HomeScreen = ({ navigation }: any) => {
 
   const handleShare = async (item: any) => {
     await Share.share({
-      message: `Découvre ${item.name} sur Swapify ! Il/elle offre "${item.skillsOffered?.[0]}" en échange de compétences. Télécharge l'app : https://swapify.app`,
+      message: `Decouvre ${item.name} sur Swapify ! Il/elle offre "${item.skillsOffered?.[0]}" en echange de competences. Telecharge l'app : https://swapify.app`,
       title: 'Partager ce profil',
     });
   };
 
-  useEffect(() => {
-    loadUsers();
-  }, [user?.uid]);
+  useEffect(() => { loadUsers(); }, [user?.uid]);
 
-  const onRefresh = () => {
-    setRefreshing(true);
-    loadUsers();
-  };
+  const onRefresh = () => { setRefreshing(true); loadUsers(); };
 
-  // Filter by category (match skills offered to category keywords)
   const categoryKeywords: Record<string, string[]> = {
     tech: ['python', 'react', 'code', 'web', 'javascript', 'machine', 'excel', 'photoshop', 'html', 'css', 'programmation'],
-    language: ['anglais', 'espagnol', 'français', 'arabe', 'mandarin', 'portugais', 'langue', 'conversation'],
-    music: ['guitare', 'piano', 'chant', 'batterie', 'ukulélé', 'musique', 'violon'],
-    cooking: ['cuisine', 'pâtisserie', 'boulangerie', 'cuisinier', 'chef', 'recette'],
+    language: ['anglais', 'espagnol', 'francais', 'arabe', 'mandarin', 'portugais', 'langue', 'conversation'],
+    music: ['guitare', 'piano', 'chant', 'batterie', 'ukulele', 'musique', 'violon'],
+    cooking: ['cuisine', 'patisserie', 'boulangerie', 'cuisinier', 'chef', 'recette'],
     sports: ['yoga', 'musculation', 'running', 'natation', 'tennis', 'boxe', 'sport', 'fitness'],
-    business: ['comptabilité', 'marketing', 'gestion', 'entrepreneur', 'finance', 'revenus'],
+    business: ['comptabilite', 'marketing', 'gestion', 'entrepreneur', 'finance', 'revenus'],
     art: ['dessin', 'peinture', 'photographie', 'montage', 'design', 'aquarelle', 'sculpture'],
-    health: ['méditation', 'nutrition', 'santé', 'bien-être', 'massothérapie'],
-    education: ['mathématiques', 'physique', 'histoire', 'philosophie', 'tutorat'],
-    home: ['jardinage', 'bricolage', 'électricité', 'plomberie', 'menuiserie'],
+    health: ['meditation', 'nutrition', 'sante', 'bien-etre', 'massotherapie'],
+    education: ['mathematiques', 'physique', 'histoire', 'philosophie', 'tutorat'],
+    home: ['jardinage', 'bricolage', 'electricite', 'plomberie', 'menuiserie'],
   };
 
   const matchesCategory = (userItem: any, cat: SkillCategory) => {
@@ -86,20 +87,38 @@ export const HomeScreen = ({ navigation }: any) => {
     return keywords.some(kw => skills.includes(kw));
   };
 
-  const filtered = activeCategory === 'all'
-    ? users
-    : users.filter(u => matchesCategory(u, activeCategory));
+  const filtered = users
+    .filter(u => activeCategory === 'all' || matchesCategory(u, activeCategory))
+    .filter(u => {
+      if (!search) return true;
+      const q = search.toLowerCase();
+      return (
+        u.name?.toLowerCase().includes(q) ||
+        (u.skillsOffered || []).some((s: string) => s.toLowerCase().includes(q)) ||
+        (u.skillsWanted || []).some((s: string) => s.toLowerCase().includes(q))
+      );
+    });
+
+  const newMembers = [...users]
+    .sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0))
+    .slice(0, 5);
 
   const renderUserCard = ({ item }: { item: any }) => {
-    const offered = item.skillsOffered?.[0] || 'Compétence à définir';
-    const wanted = item.skillsWanted?.[0] || 'Ouvert aux échanges';
+    const offered = item.skillsOffered?.[0] || 'Competence a definir';
+    const wanted = item.skillsWanted?.[0] || 'Ouvert aux echanges';
+    const isFav = favorites.includes(item.id);
+    const online = isUserOnline(item.lastSeen);
 
     return (
-      <TouchableOpacity style={styles.card} activeOpacity={0.9}>
+      <TouchableOpacity
+        style={styles.card}
+        activeOpacity={0.92}
+        onPress={() => navigation.navigate('ExchangeDetail', { provider: item })}
+      >
         <View style={styles.cardHeader}>
           <View style={styles.avatarWrapper}>
             <Text style={styles.avatar}>{item.avatar || '🧑'}</Text>
-            {isUserOnline(item.lastSeen) && <View style={styles.onlineDot} />}
+            {online && <View style={styles.onlineDot} />}
           </View>
           <View style={styles.userInfo}>
             <Text style={styles.userName}>{item.name}</Text>
@@ -117,15 +136,14 @@ export const HomeScreen = ({ navigation }: any) => {
             </TouchableOpacity>
             <TouchableOpacity onPress={() => handleFavorite(item.id)} style={styles.actionBtn}>
               <Ionicons
-                name={favorites.includes(item.id) ? 'heart' : 'heart-outline'}
+                name={isFav ? 'heart' : 'heart-outline'}
                 size={20}
-                color={favorites.includes(item.id) ? Colors.error : Colors.textMuted}
+                color={isFav ? Colors.error : Colors.textMuted}
               />
             </TouchableOpacity>
           </View>
         </View>
 
-        {/* Skills offered tags */}
         {item.skillsOffered?.length > 1 && (
           <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.tagsScroll}>
             {item.skillsOffered.slice(0, 4).map((s: string, i: number) => (
@@ -155,7 +173,7 @@ export const HomeScreen = ({ navigation }: any) => {
           onPress={() => navigation.navigate('ExchangeDetail', { provider: item })}
         >
           <Ionicons name="swap-horizontal" size={16} color={Colors.white} />
-          <Text style={styles.requestBtnText}>Proposer un échange</Text>
+          <Text style={styles.requestBtnText}>Proposer un echange</Text>
         </TouchableOpacity>
       </TouchableOpacity>
     );
@@ -175,9 +193,9 @@ export const HomeScreen = ({ navigation }: any) => {
       </View>
 
       {/* Stats bar */}
-      <View style={styles.statsBar}>
+      <Animated.View style={[styles.statsBar, { opacity: fadeAnim }]}>
         <View style={styles.statItem}>
-          <Text style={styles.statValue}>0h</Text>
+          <Text style={styles.statValue}>{timeBalance}h</Text>
           <Text style={styles.statLabel}>Ton solde</Text>
         </View>
         <View style={styles.statDivider} />
@@ -186,12 +204,27 @@ export const HomeScreen = ({ navigation }: any) => {
           <Text style={styles.statLabel}>Membres</Text>
         </View>
         <View style={styles.statDivider} />
-        <View style={styles.statItem}>
-          <TouchableOpacity onPress={() => navigation.navigate('Explore')}>
-            <Text style={[styles.statValue, { color: Colors.primary }]}>Explorer</Text>
-            <Text style={styles.statLabel}>Toutes les skills</Text>
+        <TouchableOpacity style={styles.statItem} onPress={() => navigation.navigate('Explore')}>
+          <Text style={[styles.statValue, { color: Colors.primary }]}>Explorer</Text>
+          <Text style={styles.statLabel}>Toutes les skills</Text>
+        </TouchableOpacity>
+      </Animated.View>
+
+      {/* Barre de recherche */}
+      <View style={styles.searchRow}>
+        <Ionicons name="search-outline" size={18} color={Colors.textMuted} style={styles.searchIcon} />
+        <TextInput
+          style={styles.searchInput}
+          placeholder="Rechercher un membre ou une skill..."
+          placeholderTextColor={Colors.textMuted}
+          value={search}
+          onChangeText={setSearch}
+        />
+        {search.length > 0 && (
+          <TouchableOpacity onPress={() => setSearch('')}>
+            <Ionicons name="close-circle" size={18} color={Colors.textMuted} />
           </TouchableOpacity>
-        </View>
+        )}
       </View>
 
       {/* Categories */}
@@ -229,8 +262,8 @@ export const HomeScreen = ({ navigation }: any) => {
       ) : filtered.length === 0 ? (
         <View style={styles.emptyContainer}>
           <Text style={styles.emptyEmoji}>🔍</Text>
-          <Text style={styles.emptyTitle}>Aucun membre ici</Text>
-          <Text style={styles.emptySubtitle}>Essaie une autre catégorie !</Text>
+          <Text style={styles.emptyTitle}>Aucun resultat</Text>
+          <Text style={styles.emptySubtitle}>Essaie une autre recherche ou categorie !</Text>
         </View>
       ) : (
         <FlatList
@@ -239,11 +272,27 @@ export const HomeScreen = ({ navigation }: any) => {
           contentContainerStyle={styles.list}
           showsVerticalScrollIndicator={false}
           refreshControl={
-            <RefreshControl
-              refreshing={refreshing}
-              onRefresh={onRefresh}
-              tintColor={Colors.primary}
-            />
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={Colors.primary} />
+          }
+          ListHeaderComponent={
+            !search && activeCategory === 'all' && newMembers.length > 0 ? (
+              <View style={styles.newSection}>
+                <Text style={styles.sectionTitle}>🆕 Nouveaux membres</Text>
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.newScroll}>
+                  {newMembers.map(m => (
+                    <TouchableOpacity
+                      key={m.id}
+                      style={styles.newCard}
+                      onPress={() => navigation.navigate('ExchangeDetail', { provider: m })}
+                    >
+                      <Text style={styles.newAvatar}>{m.avatar || '🧑'}</Text>
+                      <Text style={styles.newName} numberOfLines={1}>{m.name}</Text>
+                      <Text style={styles.newSkill} numberOfLines={1}>{m.skillsOffered?.[0] || '—'}</Text>
+                    </TouchableOpacity>
+                  ))}
+                </ScrollView>
+              </View>
+            ) : null
           }
           renderItem={renderUserCard}
         />
@@ -267,12 +316,21 @@ const styles = StyleSheet.create({
   statsBar: {
     flexDirection: 'row', backgroundColor: Colors.surface,
     marginHorizontal: 20, borderRadius: 16, padding: 16,
-    marginBottom: 16, borderWidth: 1, borderColor: Colors.border,
+    marginBottom: 12, borderWidth: 1, borderColor: Colors.border,
   },
   statItem: { flex: 1, alignItems: 'center' },
   statValue: { color: Colors.text, fontSize: 18, fontWeight: '700' },
   statLabel: { color: Colors.textMuted, fontSize: 11, marginTop: 2 },
   statDivider: { width: 1, backgroundColor: Colors.border },
+  searchRow: {
+    flexDirection: 'row', alignItems: 'center',
+    backgroundColor: Colors.surface, borderRadius: 14,
+    marginHorizontal: 20, marginBottom: 12,
+    paddingHorizontal: 14, paddingVertical: 10,
+    borderWidth: 1, borderColor: Colors.border,
+  },
+  searchIcon: { marginRight: 8 },
+  searchInput: { flex: 1, color: Colors.text, fontSize: 14 },
   categories: { paddingHorizontal: 20, paddingBottom: 12, gap: 8 },
   catChip: {
     flexDirection: 'row', alignItems: 'center',
@@ -291,6 +349,17 @@ const styles = StyleSheet.create({
   emptyEmoji: { fontSize: 48, marginBottom: 12 },
   emptyTitle: { color: Colors.text, fontSize: 18, fontWeight: '700', marginBottom: 4 },
   emptySubtitle: { color: Colors.textMuted, fontSize: 14 },
+  newSection: { marginBottom: 16 },
+  sectionTitle: { color: Colors.text, fontSize: 16, fontWeight: '700', marginBottom: 12 },
+  newScroll: { marginHorizontal: -4 },
+  newCard: {
+    width: 90, backgroundColor: Colors.surface, borderRadius: 16,
+    padding: 12, alignItems: 'center', marginHorizontal: 4,
+    borderWidth: 1, borderColor: Colors.border,
+  },
+  newAvatar: { fontSize: 28, marginBottom: 6 },
+  newName: { color: Colors.text, fontSize: 12, fontWeight: '600', textAlign: 'center' },
+  newSkill: { color: Colors.textMuted, fontSize: 10, textAlign: 'center', marginTop: 2 },
   card: {
     backgroundColor: Colors.surface, borderRadius: 20,
     padding: 16, borderWidth: 1, borderColor: Colors.border,
@@ -298,20 +367,21 @@ const styles = StyleSheet.create({
   cardHeader: { flexDirection: 'row', alignItems: 'center', marginBottom: 12 },
   avatarWrapper: { position: 'relative', marginRight: 12 },
   avatar: { fontSize: 36 },
-  onlineDot: { position: 'absolute', bottom: 0, right: 0, width: 12, height: 12, borderRadius: 6, backgroundColor: Colors.accent, borderWidth: 2, borderColor: Colors.surface },
+  onlineDot: {
+    position: 'absolute', bottom: 0, right: 0,
+    width: 12, height: 12, borderRadius: 6,
+    backgroundColor: Colors.accent, borderWidth: 2, borderColor: Colors.surface,
+  },
   cardActions: { flexDirection: 'row', gap: 4 },
-  actionBtn: { width: 36, height: 36, borderRadius: 18, backgroundColor: Colors.background, alignItems: 'center', justifyContent: 'center' },
+  actionBtn: {
+    width: 36, height: 36, borderRadius: 18,
+    backgroundColor: Colors.background, alignItems: 'center', justifyContent: 'center',
+  },
   userInfo: { flex: 1 },
   userName: { color: Colors.text, fontSize: 16, fontWeight: '600' },
   ratingRow: { flexDirection: 'row', alignItems: 'center', marginTop: 2 },
   rating: { color: Colors.textSecondary, fontSize: 12, marginLeft: 3 },
   distance: { color: Colors.textMuted, fontSize: 12 },
-  verifiedBadge: {
-    flexDirection: 'row', alignItems: 'center', gap: 3,
-    backgroundColor: Colors.accent + '22', borderRadius: 10,
-    paddingHorizontal: 8, paddingVertical: 4,
-  },
-  verifiedText: { color: Colors.accent, fontSize: 10, fontWeight: '600' },
   tagsScroll: { marginBottom: 10 },
   offerTag: {
     backgroundColor: Colors.primaryTransparent, borderRadius: 12,
