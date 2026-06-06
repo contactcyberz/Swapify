@@ -29,4 +29,4 @@ const SLIDES = [
   {
     emoji: '📍',
     title: 'Autour de toi',
-    subtitle: 'Trouve des membres près de chez toi à Montréal
+    subtitle: 'Trouve des membres près de chez toi à Montréal',
