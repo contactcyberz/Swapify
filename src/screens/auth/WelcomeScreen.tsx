@@ -12,8 +12,8 @@ const { width } = Dimensions.get('window');
 const SLIDES = [
   {
     emoji: '🔄',
-    title: 'Échange tes talents',
-    subtitle: 'Swapify connecte des personnes qui veulent partager leurs compétences. Pas d\'argent — juste du temps.',
+    title: 'Echange tes talents',
+    subtitle: 'Swapify connecte des personnes qui veulent partager leurs competences. Pas d\'argent — juste du temps.',
     color: Colors.primary,
     bg: 'rgba(99,102,241,0.15)',
     accent: '#6366F1',
@@ -21,7 +21,7 @@ const SLIDES = [
   {
     emoji: '⏱️',
     title: '1 heure = 1 heure',
-    subtitle: 'Donne 1h de cours de Python, reçois 1h de guitare. Le temps de chacun a la même valeur.',
+    subtitle: 'Donne 1h de cours de Python, recois 1h de guitare. Le temps de chacun a la meme valeur.',
     color: '#F59E0B',
     bg: 'rgba(245,158,11,0.15)',
     accent: '#F59E0B',
