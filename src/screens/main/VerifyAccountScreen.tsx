@@ -59,18 +59,18 @@ export const VerifyAccountScreen = ({ navigation }: any) => {
     profile?.bio &&
     (profile?.skillsOffered?.length ?? 0) > 0
   );
+  const hasPhone = !!(profile?.phone);
   const hasExchange = (profile?.exchangeCount ?? 0) > 0;
   const hasGoodRating = (profile?.rating ?? 0) >= 4;
 
-const hasPhone = !!(profile?.phone);
-  const completedCount = [profileComplete, true /* email */, hasPhone, hasExchange, hasGoodRating].filter(Boolean).length;
+  const completedCount = [profileComplete, true, hasPhone, hasExchange, hasGoodRating].filter(Boolean).length;
   const progress = completedCount / 5;
 
   const handleRequestBadge = async () => {
     if (completedCount < 5) {
       Alert.alert(
         'Pas encore !',
-        `Tu dois compléter ${4 - completedCount} étape${4 - completedCount > 1 ? 's' : ''} de plus avant de demander la vérification.`,
+        `Tu dois completer ${5 - completedCount} etape${5 - completedCount > 1 ? 's' : ''} de plus avant de demander la verification.`,
       );
       return;
     }
@@ -80,11 +80,11 @@ const hasPhone = !!(profile?.phone);
         await updateDoc(doc(db, 'users', user.uid), { verificationRequested: true });
       }
       Alert.alert(
-        '✅ Demande envoyée !',
-        'Notre équipe va examiner ton profil sous 48h. Tu seras notifié par email.',
+        'Demande envoyee !',
+        'Notre equipe va examiner ton profil sous 48h. Tu seras notifie par email.',
       );
     } catch (e) {
-      Alert.alert('Erreur', 'Réessaie dans un moment.');
+      Alert.alert('Erreur', 'Reessaie dans un moment.');
     } finally {
       setRequesting(false);
     }
@@ -93,34 +93,29 @@ const hasPhone = !!(profile?.phone);
   return (
     <SafeAreaView style={styles.container} edges={['top']}>
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
-        {/* Header */}
         <View style={styles.header}>
           <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
             <Ionicons name="arrow-back" size={24} color={Colors.text} />
           </TouchableOpacity>
-          <Text style={styles.title}>Vérifier mon compte</Text>
+          <Text style={styles.title}>Verifier mon compte</Text>
           <View style={{ width: 40 }} />
         </View>
 
-        {/* Badge preview */}
         <View style={styles.badgeCard}>
           <View style={[styles.badgeIcon, { opacity: completedCount === 5 ? 1 : 0.35 }]}>
             <Ionicons name="shield-checkmark" size={56} color={Colors.accent} />
           </View>
-          <Text style={styles.badgeTitle}>Compte vérifié ✓</Text>
+          <Text style={styles.badgeTitle}>Compte verifie</Text>
           <Text style={styles.badgeDesc}>
-            Le badge vérifié montre à la communauté que tu es un membre de confiance.
+            Le badge verifie montre a la communaute que tu es un membre de confiance.
           </Text>
-
-          {/* Progress bar */}
           <View style={styles.progressBg}>
             <View style={[styles.progressFill, { width: `${progress * 100}%` as any }]} />
           </View>
-          <Text style={styles.progressLabel}>{completedCount}/4 étapes complétées</Text>
+          <Text style={styles.progressLabel}>{completedCount}/5 etapes completees</Text>
         </View>
 
-        {/* Steps */}
-        <Text style={styles.sectionTitle}>Étapes de vérification</Text>
+        <Text style={styles.sectionTitle}>Etapes de verification</Text>
         <View style={styles.stepsContainer}>
           {STEPS.map((step, i) => {
             const done = i === 0 ? profileComplete : i === 1 ? true : i === 2 ? hasPhone : i === 3 ? hasExchange : hasGoodRating;
@@ -138,7 +133,7 @@ const hasPhone = !!(profile?.phone);
                     <Text style={[styles.stepTitle, done && styles.stepTitleDone]}>{step.title}</Text>
                     {done && (
                       <View style={styles.doneBadge}>
-                        <Text style={styles.doneBadgeText}>✓ Complété</Text>
+                        <Text style={styles.doneBadgeText}>Complete</Text>
                       </View>
                     )}
                   </View>
@@ -157,20 +152,19 @@ const hasPhone = !!(profile?.phone);
           })}
         </View>
 
-        {/* Request button */}
         <TouchableOpacity
-          style={[styles.requestBtn, completedCount < 4 && styles.requestBtnDisabled]}
+          style={[styles.requestBtn, completedCount < 5 && styles.requestBtnDisabled]}
           onPress={handleRequestBadge}
           disabled={requesting}
         >
           <Ionicons name="shield-checkmark-outline" size={18} color={Colors.white} />
           <Text style={styles.requestBtnText}>
-            {requesting ? 'Envoi en cours...' : 'Demander la vérification'}
+            {requesting ? 'Envoi en cours...' : 'Demander la verification'}
           </Text>
         </TouchableOpacity>
 
         <Text style={styles.footer}>
-          La vérification est gratuite. Notre équipe examine chaque demande manuellement sous 48h.
+          La verification est gratuite. Notre equipe examine chaque demande manuellement sous 48h.
         </Text>
       </ScrollView>
     </SafeAreaView>
