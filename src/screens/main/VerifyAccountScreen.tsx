@@ -104,7 +104,7 @@ const hasPhone = !!(profile?.phone);
 
         {/* Badge preview */}
         <View style={styles.badgeCard}>
-          <View style={[styles.badgeIcon, { opacity: completedCount === 4 ? 1 : 0.35 }]}>
+          <View style={[styles.badgeIcon, { opacity: completedCount === 5 ? 1 : 0.35 }]}>
             <Ionicons name="shield-checkmark" size={56} color={Colors.accent} />
           </View>
           <Text style={styles.badgeTitle}>Compte vérifié ✓</Text>
