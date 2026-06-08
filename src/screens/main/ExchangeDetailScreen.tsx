@@ -81,6 +81,11 @@ export const ExchangeDetailScreen = ({ route, navigation }: any) => {
         duration,
         status: 'pending',
       });
+      trackEvent('exchange_proposed', {
+        skill_offered: offeredSkill,
+        skill_wanted: mySkill || wantedSkill,
+        duration,
+      });
       setShowSuccess(true);
     } catch (e) {
       Alert.alert('Erreur', 'Impossible d\'envoyer la proposition. Reessaie !');
