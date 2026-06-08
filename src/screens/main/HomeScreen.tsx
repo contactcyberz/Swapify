@@ -13,7 +13,31 @@ import { toggleFavorite, getFavorites } from '../../services/favorites';
 import { updatePresence, isUserOnline } from '../../services/presence';
 import { getUserProfile } from '../../services/auth';
 import { Share } from 'react-native';
-
+const SkeletonCard = () => {
+  const shimmer = useRef(new Animated.Value(0)).current;
+  useEffect(() => {
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(shimmer, { toValue: 1, duration: 900, useNativeDriver: true }),
+        Animated.timing(shimmer, { toValue: 0, duration: 900, useNativeDriver: true }),
+      ])
+    ).start();
+  }, []);
+  const opacity = shimmer.interpolate({ inputRange: [0, 1], outputRange: [0.3, 0.7] });
+  return (
+    <Animated.View style={[styles.card, { opacity }]}>
+      <View style={styles.cardHeader}>
+        <View style={{ width: 44, height: 44, borderRadius: 22, backgroundColor: Colors.border, marginRight: 12 }} />
+        <View style={{ flex: 1, gap: 8 }}>
+          <View style={{ height: 14, width: '60%', backgroundColor: Colors.border, borderRadius: 7 }} />
+          <View style={{ height: 11, width: '40%', backgroundColor: Colors.border, borderRadius: 6 }} />
+        </View>
+      </View>
+      <View style={{ height: 56, backgroundColor: Colors.border, borderRadius: 12, marginBottom: 12 }} />
+      <View style={{ height: 40, backgroundColor: Colors.border, borderRadius: 12 }} />
+    </Animated.View>
+  );
+};
 export const HomeScreen = ({ navigation }: any) => {
   const { user } = useAuth();
   const [activeCategory, setActiveCategory] = useState<SkillCategory | 'all'>('all');
