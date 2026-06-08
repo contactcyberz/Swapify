@@ -62,8 +62,9 @@ export const VerifyAccountScreen = ({ navigation }: any) => {
   const hasExchange = (profile?.exchangeCount ?? 0) > 0;
   const hasGoodRating = (profile?.rating ?? 0) >= 4;
 
-  const completedCount = [profileComplete, true /* email */, hasExchange, hasGoodRating].filter(Boolean).length;
-  const progress = completedCount / 4;
+const hasPhone = !!(profile?.phone);
+  const completedCount = [profileComplete, true /* email */, hasPhone, hasExchange, hasGoodRating].filter(Boolean).length;
+  const progress = completedCount / 5;
 
   const handleRequestBadge = async () => {
     if (completedCount < 4) {
