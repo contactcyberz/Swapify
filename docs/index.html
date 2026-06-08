@@ -1,46 +1,1003 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Swapify — Échange de compétences</title>
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: #040F1E;
-      color: #CBD5E1;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 40px 24px;
-    }
-    .logo { font-size: 52px; font-weight: 800; letter-spacing: -1px; margin-bottom: 12px; }
-    .logo span { color: #0EA5E9; }
-    p { color: #7DB9D8; font-size: 18px; margin-bottom: 32px; text-align: center; }
-    .links { display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; }
-    a {
-      display: inline-block;
-      padding: 12px 24px;
-      border-radius: 12px;
-      font-weight: 600;
-      text-decoration: none;
-      font-size: 15px;
-    }
-    .primary { background: #0EA5E9; color: #fff; }
-    .secondary { background: #091A30; border: 1px solid #0F2744; color: #7DB9D8; }
-    footer { position: fixed; bottom: 24px; color: #4B6A8A; font-size: 13px; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Swapify — Échange de compétences à Montréal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --purple: #6C63FF;
+    --purple-dark: #4B44CC;
+    --purple-light: #EEEDff;
+    --teal: #00D4AA;
+    --coral: #FF6B6B;
+    --bg: #0A0A12;
+    --surface: #13131F;
+    --surface2: #1C1C2E;
+    --text: #F0F0FF;
+    --muted: #8888AA;
+    --border: rgba(108,99,255,0.2);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  /* Custom cursor */
+  .cursor {
+    width: 12px; height: 12px;
+    background: var(--purple);
+    border-radius: 50%;
+    position: fixed; top: 0; left: 0;
+    pointer-events: none;
+    z-index: 9999;
+    transition: transform 0.15s ease;
+    mix-blend-mode: screen;
+  }
+  .cursor-ring {
+    width: 36px; height: 36px;
+    border: 1.5px solid var(--purple);
+    border-radius: 50%;
+    position: fixed; top: 0; left: 0;
+    pointer-events: none;
+    z-index: 9998;
+    transition: all 0.25s ease;
+    opacity: 0.5;
+  }
+
+  /* Noise overlay */
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none; z-index: 1000; opacity: 0.4;
+  }
+
+  /* Nav */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0;
+    padding: 20px 48px;
+    display: flex; align-items: center; justify-content: space-between;
+    z-index: 100;
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    background: rgba(10,10,18,0.8);
+  }
+
+  .logo {
+    font-family: 'Syne', sans-serif;
+    font-size: 22px; font-weight: 800;
+    color: var(--text);
+    display: flex; align-items: center; gap: 10px;
+    text-decoration: none;
+  }
+
+  .logo-icon {
+    width: 36px; height: 36px;
+    background: var(--purple);
+    border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+  }
+
+  .nav-links {
+    display: flex; gap: 36px; list-style: none;
+  }
+
+  .nav-links a {
+    color: var(--muted); text-decoration: none;
+    font-size: 14px; font-weight: 500;
+    transition: color 0.2s;
+    letter-spacing: 0.02em;
+  }
+
+  .nav-links a:hover { color: var(--text); }
+
+  .nav-cta {
+    background: var(--purple);
+    color: white !important;
+    padding: 10px 24px;
+    border-radius: 100px;
+    font-weight: 500 !important;
+    transition: all 0.2s !important;
+  }
+
+  .nav-cta:hover {
+    background: var(--purple-dark) !important;
+    color: white !important;
+    transform: translateY(-1px);
+  }
+
+  /* Hero */
+  .hero {
+    min-height: 100vh;
+    display: flex; align-items: center;
+    padding: 120px 48px 80px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-bg {
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 60% 40%, rgba(108,99,255,0.12) 0%, transparent 70%),
+      radial-gradient(ellipse 40% 40% at 80% 80%, rgba(0,212,170,0.06) 0%, transparent 60%);
+  }
+
+  .hero-grid {
+    position: absolute; inset: 0;
+    background-image:
+      linear-gradient(var(--border) 1px, transparent 1px),
+      linear-gradient(90deg, var(--border) 1px, transparent 1px);
+    background-size: 60px 60px;
+    mask-image: radial-gradient(ellipse 70% 70% at 50% 50%, black 0%, transparent 100%);
+    opacity: 0.3;
+  }
+
+  .hero-content {
+    max-width: 680px;
+    position: relative; z-index: 2;
+  }
+
+  .hero-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(108,99,255,0.12);
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    padding: 8px 18px;
+    font-size: 13px; color: var(--purple);
+    font-weight: 500; margin-bottom: 32px;
+    animation: fadeUp 0.6s ease both;
+  }
+
+  .badge-dot {
+    width: 6px; height: 6px;
+    background: var(--teal);
+    border-radius: 50%;
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(1.3); }
+  }
+
+  h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(52px, 7vw, 88px);
+    font-weight: 800;
+    line-height: 0.95;
+    letter-spacing: -0.03em;
+    margin-bottom: 28px;
+    animation: fadeUp 0.6s 0.1s ease both;
+  }
+
+  h1 .accent { color: var(--purple); }
+  h1 .accent2 { color: var(--teal); }
+
+  .hero-sub {
+    font-size: 18px; color: var(--muted);
+    line-height: 1.7; max-width: 520px;
+    margin-bottom: 48px; font-weight: 300;
+    animation: fadeUp 0.6s 0.2s ease both;
+  }
+
+  .hero-actions {
+    display: flex; gap: 16px; align-items: center;
+    animation: fadeUp 0.6s 0.3s ease both;
+  }
+
+  .btn-primary {
+    display: inline-flex; align-items: center; gap: 10px;
+    background: var(--purple);
+    color: white; text-decoration: none;
+    padding: 16px 32px; border-radius: 100px;
+    font-size: 15px; font-weight: 500;
+    transition: all 0.2s;
+    border: none; cursor: none;
+  }
+
+  .btn-primary:hover {
+    background: var(--purple-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 20px 40px rgba(108,99,255,0.3);
+  }
+
+  .btn-secondary {
+    display: inline-flex; align-items: center; gap: 8px;
+    color: var(--muted); text-decoration: none;
+    font-size: 14px; font-weight: 500;
+    transition: color 0.2s;
+    cursor: none;
+  }
+
+  .btn-secondary:hover { color: var(--text); }
+
+  /* Floating phone mockup */
+  .hero-visual {
+    position: absolute;
+    right: 5%;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 2;
+    animation: float 6s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(-50%) translateY(0px); }
+    50% { transform: translateY(-50%) translateY(-20px); }
+  }
+
+  .phone-frame {
+    width: 280px;
+    background: var(--surface);
+    border-radius: 44px;
+    border: 1px solid rgba(255,255,255,0.08);
+    overflow: hidden;
+    box-shadow:
+      0 80px 120px rgba(0,0,0,0.6),
+      0 0 0 1px rgba(255,255,255,0.05),
+      inset 0 1px 0 rgba(255,255,255,0.1);
+    position: relative;
+  }
+
+  .phone-notch {
+    width: 120px; height: 32px;
+    background: var(--bg);
+    border-radius: 0 0 20px 20px;
+    margin: 0 auto;
+    position: relative; z-index: 2;
+  }
+
+  .phone-screen {
+    padding: 0 16px 24px;
+    min-height: 560px;
+  }
+
+  .phone-header {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 12px 0 20px;
+  }
+
+  .phone-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 22px; font-weight: 800; color: var(--text);
+  }
+
+  .phone-avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--purple); display: flex; align-items: center; justify-content: center; font-size: 16px; }
+
+  .phone-search {
+    background: var(--surface2);
+    border-radius: 14px; padding: 10px 14px;
+    font-size: 13px; color: var(--muted);
+    margin-bottom: 20px;
+    display: flex; align-items: center; gap: 8px;
+  }
+
+  .phone-section-title {
+    font-size: 11px; color: var(--muted);
+    font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.1em; margin-bottom: 12px;
+  }
+
+  .phone-card {
+    background: var(--surface2);
+    border-radius: 16px; padding: 14px;
+    margin-bottom: 10px;
+    border: 1px solid rgba(255,255,255,0.04);
+    display: flex; align-items: center; gap: 12px;
+  }
+
+  .phone-card-avatar { font-size: 32px; }
+
+  .phone-card-info { flex: 1; }
+
+  .phone-card-name { font-size: 13px; font-weight: 600; color: var(--text); margin-bottom: 2px; }
+
+  .phone-card-skill {
+    font-size: 11px; color: var(--purple);
+    background: rgba(108,99,255,0.12);
+    border-radius: 6px; padding: 2px 8px;
+    display: inline-block;
+  }
+
+  .phone-card-btn {
+    background: var(--purple);
+    border-radius: 20px; padding: 6px 12px;
+    font-size: 11px; color: white; font-weight: 600;
+  }
+
+  /* Glowing orb behind phone */
+  .hero-glow {
+    position: absolute;
+    right: 10%;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(108,99,255,0.2) 0%, transparent 70%);
+    border-radius: 50%;
+    filter: blur(40px);
+    animation: glowPulse 4s ease-in-out infinite;
+  }
+
+  @keyframes glowPulse {
+    0%, 100% { opacity: 0.6; transform: translateY(-50%) scale(1); }
+    50% { opacity: 1; transform: translateY(-50%) scale(1.1); }
+  }
+
+  /* Stats bar */
+  .stats-bar {
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    padding: 28px 48px;
+    display: flex; justify-content: center; gap: 80px;
+    position: relative; z-index: 2;
+  }
+
+  .stat { text-align: center; }
+
+  .stat-num {
+    font-family: 'Syne', sans-serif;
+    font-size: 36px; font-weight: 800;
+    color: var(--text);
+    display: block;
+  }
+
+  .stat-label { font-size: 13px; color: var(--muted); margin-top: 4px; }
+
+  /* How it works */
+  .section {
+    padding: 100px 48px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .section-label {
+    font-size: 12px; color: var(--purple);
+    font-weight: 600; text-transform: uppercase;
+    letter-spacing: 0.15em; margin-bottom: 16px;
+    display: block;
+  }
+
+  h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(36px, 4vw, 56px);
+    font-weight: 800; line-height: 1.05;
+    letter-spacing: -0.02em; margin-bottom: 20px;
+  }
+
+  .section-sub {
+    font-size: 17px; color: var(--muted);
+    line-height: 1.7; max-width: 560px;
+    font-weight: 300;
+  }
+
+  /* Steps */
+  .steps {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 2px; margin-top: 64px;
+  }
+
+  .step {
+    background: var(--surface);
+    padding: 40px 36px;
+    position: relative; overflow: hidden;
+    transition: background 0.3s;
+  }
+
+  .step:first-child { border-radius: 24px 0 0 24px; }
+  .step:last-child { border-radius: 0 24px 24px 0; }
+  .step:hover { background: var(--surface2); }
+
+  .step-num {
+    font-family: 'Syne', sans-serif;
+    font-size: 80px; font-weight: 800;
+    color: rgba(108,99,255,0.1);
+    position: absolute; top: 16px; right: 24px;
+    line-height: 1;
+  }
+
+  .step-icon {
+    width: 52px; height: 52px;
+    background: rgba(108,99,255,0.12);
+    border-radius: 16px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px; margin-bottom: 24px;
+    border: 1px solid var(--border);
+  }
+
+  .step h3 {
+    font-family: 'Syne', sans-serif;
+    font-size: 20px; font-weight: 700;
+    margin-bottom: 12px; color: var(--text);
+  }
+
+  .step p {
+    font-size: 14px; color: var(--muted);
+    line-height: 1.7; font-weight: 300;
+  }
+
+  /* Features grid */
+  .features {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 2px; margin-top: 64px;
+  }
+
+  .feature {
+    background: var(--surface);
+    padding: 40px;
+    transition: background 0.3s;
+    position: relative; overflow: hidden;
+  }
+
+  .feature:nth-child(1) { border-radius: 24px 0 0 0; }
+  .feature:nth-child(2) { border-radius: 0 24px 0 0; }
+  .feature:nth-child(3) { border-radius: 0 0 0 24px; }
+  .feature:nth-child(4) { border-radius: 0 0 24px 0; }
+  .feature:hover { background: var(--surface2); }
+
+  .feature-icon { font-size: 32px; margin-bottom: 20px; display: block; }
+
+  .feature h3 {
+    font-family: 'Syne', sans-serif;
+    font-size: 18px; font-weight: 700;
+    margin-bottom: 10px; color: var(--text);
+  }
+
+  .feature p {
+    font-size: 14px; color: var(--muted);
+    line-height: 1.7; font-weight: 300;
+  }
+
+  .feature-accent {
+    position: absolute; bottom: -20px; right: -20px;
+    width: 80px; height: 80px;
+    border-radius: 50%;
+    opacity: 0.06;
+  }
+
+  /* Skills showcase */
+  .skills-marquee {
+    overflow: hidden;
+    padding: 40px 0;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+  }
+
+  .marquee-track {
+    display: flex; gap: 16px;
+    animation: marquee 30s linear infinite;
+    width: max-content;
+  }
+
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+
+  .skill-tag {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    padding: 10px 20px;
+    font-size: 14px; color: var(--muted);
+    white-space: nowrap; font-weight: 400;
+  }
+
+  .skill-tag span { font-size: 16px; }
+
+  /* CTA section */
+  .cta-section {
+    padding: 100px 48px;
+    text-align: center;
+    position: relative; overflow: hidden;
+  }
+
+  .cta-bg {
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse 60% 80% at 50% 50%, rgba(108,99,255,0.1) 0%, transparent 70%);
+  }
+
+  .cta-content { position: relative; z-index: 2; max-width: 600px; margin: 0 auto; }
+
+  .cta-section h2 { margin-bottom: 20px; }
+
+  .cta-section p {
+    font-size: 17px; color: var(--muted);
+    line-height: 1.7; margin-bottom: 48px; font-weight: 300;
+  }
+
+  .store-badges {
+    display: flex; gap: 16px; justify-content: center; align-items: center;
+  }
+
+  .store-badge {
+    display: inline-flex; align-items: center; gap: 12px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 14px 24px;
+    text-decoration: none; color: var(--text);
+    transition: all 0.2s;
+    cursor: none;
+  }
+
+  .store-badge:hover {
+    border-color: var(--purple);
+    background: rgba(108,99,255,0.08);
+    transform: translateY(-2px);
+  }
+
+  .store-badge-icon { font-size: 28px; }
+
+  .store-badge-text { text-align: left; }
+
+  .store-badge-sub { font-size: 10px; color: var(--muted); display: block; }
+
+  .store-badge-name { font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 700; }
+
+  /* Testimonials */
+  .testimonials {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 16px; margin-top: 64px;
+  }
+
+  .testimonial {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px; padding: 28px;
+    transition: border-color 0.3s;
+  }
+
+  .testimonial:hover { border-color: rgba(108,99,255,0.4); }
+
+  .testimonial-text {
+    font-size: 15px; color: var(--text);
+    line-height: 1.7; margin-bottom: 20px;
+    font-style: italic; font-weight: 300;
+  }
+
+  .testimonial-author {
+    display: flex; align-items: center; gap: 12px;
+  }
+
+  .testimonial-avatar { font-size: 32px; }
+
+  .testimonial-name { font-size: 13px; font-weight: 600; color: var(--text); }
+
+  .testimonial-role { font-size: 12px; color: var(--muted); }
+
+  .stars { color: #FFB347; font-size: 12px; margin-bottom: 4px; }
+
+  /* Footer */
+  footer {
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    padding: 48px;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+
+  .footer-logo {
+    font-family: 'Syne', sans-serif;
+    font-size: 18px; font-weight: 800; color: var(--text);
+    display: flex; align-items: center; gap: 10px;
+  }
+
+  .footer-links {
+    display: flex; gap: 32px; list-style: none;
+  }
+
+  .footer-links a {
+    color: var(--muted); text-decoration: none;
+    font-size: 13px; transition: color 0.2s;
+  }
+
+  .footer-links a:hover { color: var(--text); }
+
+  .footer-copy { font-size: 12px; color: var(--muted); }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Scroll animations */
+  .reveal {
+    opacity: 0; transform: translateY(32px);
+    transition: all 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+
+  /* Mobile */
+  @media (max-width: 768px) {
+    nav { padding: 16px 24px; }
+    .nav-links { display: none; }
+    .hero { padding: 100px 24px 60px; }
+    .hero-visual { display: none; }
+    h1 { font-size: 48px; }
+    .stats-bar { padding: 24px; gap: 32px; flex-wrap: wrap; }
+    .section { padding: 60px 24px; }
+    .steps { grid-template-columns: 1fr; gap: 2px; }
+    .step:first-child { border-radius: 24px 24px 0 0; }
+    .step:last-child { border-radius: 0 0 24px 24px; }
+    .features { grid-template-columns: 1fr; }
+    .feature:nth-child(1) { border-radius: 24px 24px 0 0; }
+    .feature:nth-child(2) { border-radius: 0; }
+    .feature:nth-child(3) { border-radius: 0; }
+    .feature:nth-child(4) { border-radius: 0 0 24px 24px; }
+    .testimonials { grid-template-columns: 1fr; }
+    .cta-section { padding: 60px 24px; }
+    .store-badges { flex-direction: column; }
+    footer { flex-direction: column; gap: 24px; text-align: center; padding: 32px 24px; }
+    .footer-links { flex-wrap: wrap; justify-content: center; gap: 16px; }
+  }
+</style>
 </head>
 <body>
-  <div class="logo">Swap<span>ify</span></div>
-  <p>Échange tes compétences avec ta communauté.<br/>Gratuit, sans argent, entre voisins. 🚀</p>
-  <div class="links">
-    <a class="primary" href="privacy.html">🔒 Politique de confidentialité</a>
-    <a class="secondary" href="mailto:support@swapify.app">📩 Nous contacter</a>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- Nav -->
+<nav>
+  <a href="#" class="logo">
+    <div class="logo-icon">🔄</div>
+    Swapify
+  </a>
+  <ul class="nav-links">
+    <li><a href="#how">Comment ça marche</a></li>
+    <li><a href="#features">Fonctionnalités</a></li>
+    <li><a href="#community">Communauté</a></li>
+    <li><a href="#download" class="nav-cta">Télécharger</a></li>
+  </ul>
+</nav>
+
+<!-- Hero -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+  <div class="hero-glow"></div>
+
+  <div class="hero-content">
+    <div class="hero-badge">
+      <span class="badge-dot"></span>
+      Disponible à Montréal · Bientôt sur App Store
+    </div>
+
+    <h1>
+      Échange<br>
+      tes <span class="accent">talents</span>,<br>
+      gagne du <span class="accent2">temps</span>.
+    </h1>
+
+    <p class="hero-sub">
+      Swapify connecte les Montréalais pour s'entraider sans argent. 
+      Offre ce que tu sais faire, reçois ce dont tu as besoin.
+    </p>
+
+    <div class="hero-actions">
+      <a href="#download" class="btn-primary">
+        <span>📱</span>
+        Rejoindre la bêta
+      </a>
+      <a href="#how" class="btn-secondary">
+        Voir comment ça marche →
+      </a>
+    </div>
   </div>
-  <footer>© 2026 Swapify · Meriem Aliane · Montréal, Québec</footer>
+
+  <!-- Phone mockup -->
+  <div class="hero-visual">
+    <div class="phone-frame">
+      <div class="phone-notch"></div>
+      <div class="phone-screen">
+        <div class="phone-header">
+          <span class="phone-title">Accueil</span>
+          <div class="phone-avatar">🧑</div>
+        </div>
+        <div class="phone-search">🔍 Rechercher une compétence...</div>
+        <div class="phone-section-title">Membres près de toi</div>
+        <div class="phone-card">
+          <div class="phone-card-avatar">👩‍🎨</div>
+          <div class="phone-card-info">
+            <div class="phone-card-name">Sophie M.</div>
+            <div class="phone-card-skill">Design graphique</div>
+          </div>
+          <div class="phone-card-btn">Swap</div>
+        </div>
+        <div class="phone-card">
+          <div class="phone-card-avatar">👨‍💻</div>
+          <div class="phone-card-info">
+            <div class="phone-card-name">Karim B.</div>
+            <div class="phone-card-skill">Développement web</div>
+          </div>
+          <div class="phone-card-btn">Swap</div>
+        </div>
+        <div class="phone-card">
+          <div class="phone-card-avatar">👩‍🍳</div>
+          <div class="phone-card-info">
+            <div class="phone-card-name">Marie L.</div>
+            <div class="phone-card-skill">Cuisine marocaine</div>
+          </div>
+          <div class="phone-card-btn">Swap</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Stats -->
+<div class="stats-bar">
+  <div class="stat">
+    <span class="stat-num">100%</span>
+    <div class="stat-label">Gratuit · Toujours</div>
+  </div>
+  <div class="stat">
+    <span class="stat-num">0$</span>
+    <div class="stat-label">Pas de frais cachés</div>
+  </div>
+  <div class="stat">
+    <span class="stat-num">MTL</span>
+    <div class="stat-label">Communauté locale</div>
+  </div>
+  <div class="stat">
+    <span class="stat-num">∞</span>
+    <div class="stat-label">Compétences possibles</div>
+  </div>
+</div>
+
+<!-- Skills marquee -->
+<div class="skills-marquee">
+  <div class="marquee-track">
+    <div class="skill-tag"><span>🎨</span> Design graphique</div>
+    <div class="skill-tag"><span>💻</span> Développement web</div>
+    <div class="skill-tag"><span>🍳</span> Cuisine</div>
+    <div class="skill-tag"><span>📸</span> Photographie</div>
+    <div class="skill-tag"><span>🎸</span> Guitare</div>
+    <div class="skill-tag"><span>🌿</span> Jardinage</div>
+    <div class="skill-tag"><span>📝</span> Rédaction</div>
+    <div class="skill-tag"><span>🧘</span> Yoga</div>
+    <div class="skill-tag"><span>🔧</span> Bricolage</div>
+    <div class="skill-tag"><span>🎭</span> Théâtre</div>
+    <div class="skill-tag"><span>📊</span> Comptabilité</div>
+    <div class="skill-tag"><span>🗣️</span> Langues</div>
+    <div class="skill-tag"><span>🎨</span> Design graphique</div>
+    <div class="skill-tag"><span>💻</span> Développement web</div>
+    <div class="skill-tag"><span>🍳</span> Cuisine</div>
+    <div class="skill-tag"><span>📸</span> Photographie</div>
+    <div class="skill-tag"><span>🎸</span> Guitare</div>
+    <div class="skill-tag"><span>🌿</span> Jardinage</div>
+    <div class="skill-tag"><span>📝</span> Rédaction</div>
+    <div class="skill-tag"><span>🧘</span> Yoga</div>
+    <div class="skill-tag"><span>🔧</span> Bricolage</div>
+    <div class="skill-tag"><span>🎭</span> Théâtre</div>
+    <div class="skill-tag"><span>📊</span> Comptabilité</div>
+    <div class="skill-tag"><span>🗣️</span> Langues</div>
+  </div>
+</div>
+
+<!-- How it works -->
+<section class="section" id="how">
+  <div class="reveal">
+    <span class="section-label">Comment ça marche</span>
+    <h2>Simple comme<br>un échange entre amis.</h2>
+    <p class="section-sub">Pas de monnaie, pas de transactions. Juste du temps et des compétences qui circulent dans ta communauté.</p>
+  </div>
+
+  <div class="steps reveal">
+    <div class="step">
+      <div class="step-num">01</div>
+      <div class="step-icon">👤</div>
+      <h3>Crée ton profil</h3>
+      <p>Présente tes compétences, ce que tu aimes faire et ce que tu souhaites apprendre.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">02</div>
+      <div class="step-icon">🔍</div>
+      <h3>Explore la communauté</h3>
+      <p>Découvre les membres de Montréal, leurs talents et propose un échange en quelques secondes.</p>
+    </div>
+    <div class="step">
+      <div class="step-num">03</div>
+      <div class="step-icon">🤝</div>
+      <h3>Échange & grandis</h3>
+      <p>Rencontrez-vous, échangez vos savoir-faire, notez l'expérience et construisez votre réputation.</p>
+    </div>
+  </div>
+</section>
+
+<!-- Features -->
+<section class="section" id="features" style="padding-top:0">
+  <div class="reveal">
+    <span class="section-label">Fonctionnalités</span>
+    <h2>Tout ce dont tu as<br>besoin, rien de plus.</h2>
+    <p class="section-sub">Conçu pour être simple, sécuritaire et centré sur l'humain.</p>
+  </div>
+
+  <div class="features reveal">
+    <div class="feature">
+      <span class="feature-icon">💬</span>
+      <h3>Chat en temps réel</h3>
+      <p>Discute directement avec les membres, organise vos échanges et suivez vos conversations en un endroit.</p>
+      <div class="feature-accent" style="background:var(--purple)"></div>
+    </div>
+    <div class="feature">
+      <span class="feature-icon">⭐</span>
+      <h3>Système de confiance</h3>
+      <p>Notes, avis vérifiés et badges de membre de confiance pour des échanges en toute sérénité.</p>
+      <div class="feature-accent" style="background:var(--teal)"></div>
+    </div>
+    <div class="feature">
+      <span class="feature-icon">🔔</span>
+      <h3>Notifications instantanées</h3>
+      <p>Sois alerté dès qu'un membre répond à ta proposition, accepte un échange ou t'envoie un message.</p>
+      <div class="feature-accent" style="background:var(--coral)"></div>
+    </div>
+    <div class="feature">
+      <span class="feature-icon">🛡️</span>
+      <h3>Sécurité & confidentialité</h3>
+      <p>Tes données restent au Canada, conformes à la Loi 25 du Québec. Signalement et blocage en un tap.</p>
+      <div class="feature-accent" style="background:var(--purple)"></div>
+    </div>
+  </div>
+</section>
+
+<!-- Testimonials -->
+<section class="section" id="community" style="padding-top:0">
+  <div class="reveal">
+    <span class="section-label">Communauté</span>
+    <h2>Ce que disent<br>nos membres.</h2>
+    <p class="section-sub">Des Montréalais qui échangent leurs talents chaque semaine.</p>
+  </div>
+
+  <div class="testimonials reveal">
+    <div class="testimonial">
+      <div class="stars">★★★★★</div>
+      <p class="testimonial-text">"J'ai appris la photo en échange de cours de français. Une expérience incroyable, je n'aurais jamais pu me payer un photographe pro."</p>
+      <div class="testimonial-author">
+        <div class="testimonial-avatar">👩‍🎨</div>
+        <div>
+          <div class="testimonial-name">Amina K.</div>
+          <div class="testimonial-role">Designer · Plateau-Mont-Royal</div>
+        </div>
+      </div>
+    </div>
+    <div class="testimonial">
+      <div class="stars">★★★★★</div>
+      <p class="testimonial-text">"Swapify m'a permis de faire réparer ma vélo par un mécanicien en échange de quelques heures de cours de guitare. Génial !"</p>
+      <div class="testimonial-author">
+        <div class="testimonial-avatar">👨‍🎸</div>
+        <div>
+          <div class="testimonial-name">Thomas B.</div>
+          <div class="testimonial-role">Musicien · Rosemont</div>
+        </div>
+      </div>
+    </div>
+    <div class="testimonial">
+      <div class="stars">★★★★★</div>
+      <p class="testimonial-text">"L'app est super intuitive et la communauté est vraiment bienveillante. J'ai trouvé une tutrice en maths pour ma fille en une journée."</p>
+      <div class="testimonial-author">
+        <div class="testimonial-avatar">👩‍💼</div>
+        <div>
+          <div class="testimonial-name">Sarah M.</div>
+          <div class="testimonial-role">Ingénieure · Mile-End</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section" id="download">
+  <div class="cta-bg"></div>
+  <div class="cta-content reveal">
+    <span class="section-label">Télécharger</span>
+    <h2>Prêt à rejoindre la communauté ?</h2>
+    <p>Swapify est gratuit, sans pub, sans abonnement. Juste des gens qui s'entraident à Montréal.</p>
+    <div class="store-badges">
+      <a href="#" class="store-badge">
+        <div class="store-badge-icon">🍎</div>
+        <div class="store-badge-text">
+          <span class="store-badge-sub">Disponible sur</span>
+          <span class="store-badge-name">App Store</span>
+        </div>
+      </a>
+      <a href="#" class="store-badge" style="opacity:0.5;pointer-events:none">
+        <div class="store-badge-icon">🤖</div>
+        <div class="store-badge-text">
+          <span class="store-badge-sub">Bientôt sur</span>
+          <span class="store-badge-name">Google Play</span>
+        </div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer>
+  <div class="footer-logo">
+    <div class="logo-icon" style="width:30px;height:30px;font-size:14px">🔄</div>
+    Swapify
+  </div>
+  <ul class="footer-links">
+    <li><a href="#">Confidentialité</a></li>
+    <li><a href="#">CGU</a></li>
+    <li><a href="#">Contact</a></li>
+    <li><a href="#">Cyberzentrix</a></li>
+  </ul>
+  <div class="footer-copy">© 2026 Cyberzentrix · Montréal, QC</div>
+</footer>
+
+<script>
+  // Custom cursor
+  const cursor = document.getElementById('cursor');
+  const ring = document.getElementById('cursorRing');
+  let mx = 0, my = 0, rx = 0, ry = 0;
+
+  document.addEventListener('mousemove', e => {
+    mx = e.clientX; my = e.clientY;
+    cursor.style.left = mx - 6 + 'px';
+    cursor.style.top = my - 6 + 'px';
+  });
+
+  function animRing() {
+    rx += (mx - rx - 18) * 0.12;
+    ry += (my - ry - 18) * 0.12;
+    ring.style.left = rx + 'px';
+    ring.style.top = ry + 'px';
+    requestAnimationFrame(animRing);
+  }
+  animRing();
+
+  document.querySelectorAll('a, button').forEach(el => {
+    el.addEventListener('mouseenter', () => {
+      cursor.style.transform = 'scale(2.5)';
+      ring.style.transform = 'scale(1.5)';
+      ring.style.opacity = '0.8';
+    });
+    el.addEventListener('mouseleave', () => {
+      cursor.style.transform = 'scale(1)';
+      ring.style.transform = 'scale(1)';
+      ring.style.opacity = '0.5';
+    });
+  });
+
+  // Scroll reveal
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach((entry, i) => {
+      if (entry.isIntersecting) {
+        setTimeout(() => entry.target.classList.add('visible'), i * 100);
+      }
+    });
+  }, { threshold: 0.1 });
+
+  reveals.forEach(el => observer.observe(el));
+
+  // Smooth nav on scroll
+  window.addEventListener('scroll', () => {
+    const nav = document.querySelector('nav');
+    if (window.scrollY > 50) {
+      nav.style.background = 'rgba(10,10,18,0.95)';
+    } else {
+      nav.style.background = 'rgba(10,10,18,0.8)';
+    }
+  });
+</script>
 </body>
 </html>
