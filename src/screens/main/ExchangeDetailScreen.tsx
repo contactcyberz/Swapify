@@ -10,7 +10,7 @@ import { Colors } from '../../constants/colors';
 import { useAuth } from '../../hooks/useAuth';
 import { createExchange } from '../../services/exchanges';
 import { reportUser, REPORT_REASONS, ReportReason } from '../../services/reports';
-
+import { trackEvent } from '../../services/firebase';
 const DURATIONS = ['30 min', '1h', '2h', '3h'];
 const MAX_MESSAGE = 300;
 
