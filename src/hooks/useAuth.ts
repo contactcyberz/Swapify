@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { onAuthChange, getUserProfile } from '../services/auth';
 import { registerForPushNotifications } from '../services/notifications';
+import { trackEvent } from '../services/firebase';
 
 export const useAuth = () => {
   const [user, setUser] = useState<any>(null);
@@ -14,8 +15,10 @@ export const useAuth = () => {
         const p = await getUserProfile(firebaseUser.uid);
         setProfile(p);
         registerForPushNotifications(firebaseUser.uid);
+        trackEvent('login', { method: 'email' });
       } else {
         setProfile(null);
+        trackEvent('logout');
       }
       setLoading(false);
     });
