@@ -123,7 +123,7 @@ const hasPhone = !!(profile?.phone);
         <Text style={styles.sectionTitle}>Étapes de vérification</Text>
         <View style={styles.stepsContainer}>
           {STEPS.map((step, i) => {
-            const done = i === 0 ? profileComplete : i === 1 ? true : i === 2 ? hasExchange : hasGoodRating;
+            const done = i === 0 ? profileComplete : i === 1 ? true : i === 2 ? hasPhone : i === 3 ? hasExchange : hasGoodRating;
             return (
               <View key={i} style={styles.stepCard}>
                 <View style={[styles.stepIcon, { backgroundColor: step.color + '22' }]}>
