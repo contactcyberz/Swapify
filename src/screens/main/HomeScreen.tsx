@@ -278,11 +278,10 @@ export const HomeScreen = ({ navigation }: any) => {
       </ScrollView>
 
       {/* Users list */}
-      {loading ? (
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator color={Colors.primary} size="large" />
-          <Text style={styles.loadingText}>Chargement des membres...</Text>
-        </View>
+     {loading ? (
+        <ScrollView contentContainerStyle={styles.list} showsVerticalScrollIndicator={false}>
+          {[1,2,3].map(i => <SkeletonCard key={i} />)}
+        </ScrollView>
       ) : filtered.length === 0 ? (
         <View style={styles.emptyContainer}>
           <Text style={styles.emptyEmoji}>🔍</Text>
