@@ -67,7 +67,7 @@ const hasPhone = !!(profile?.phone);
   const progress = completedCount / 5;
 
   const handleRequestBadge = async () => {
-    if (completedCount < 4) {
+    if (completedCount < 5) {
       Alert.alert(
         'Pas encore !',
         `Tu dois compléter ${4 - completedCount} étape${4 - completedCount > 1 ? 's' : ''} de plus avant de demander la vérification.`,
