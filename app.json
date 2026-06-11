@@ -19,7 +19,8 @@
           "locationAlwaysPermission": "Swapify utilise ta localisation pour trouver des personnes près de toi.",
           "locationWhenInUsePermission": "Swapify utilise ta localisation pour trouver des personnes près de toi."
         }
-      ]
+      ],
+      "@react-native-firebase/analytics"
     ],
     "ios": {
       "supportsTablet": false,
