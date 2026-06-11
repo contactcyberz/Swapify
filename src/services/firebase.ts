@@ -1,6 +1,8 @@
 import { initializeApp, getApps } from 'firebase/app';
 import { getFirestore } from 'firebase/firestore';
 import { getAnalytics, logEvent, isSupported } from 'firebase/analytics';
+import { initializeAuth, getAuth, getReactNativePersistence } from 'firebase/auth';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const firebaseConfig = {
   apiKey: "AIzaSyBW8mkFPyB9g39siwSI08HCfMMNltJh8ok",
@@ -15,24 +17,35 @@ const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0
 export const db = getFirestore(app);
 
 let firebaseAuth: any = null;
+
 try {
-  const { initializeAuth, getAuth, getReactNativePersistence } = require('firebase/auth');
-  const AsyncStorage = require('@react-native-async-storage/async-storage').default;
-  try {
-    firebaseAuth = initializeAuth(app, {
-      persistence: getReactNativePersistence(AsyncStorage),
-    });
-  } catch (e) {
-    firebaseAuth = getAuth(app);
+  if (getApps().length > 0) {
+    try {
+      firebaseAuth = initializeAuth(app, {
+        persistence: getReactNativePersistence(AsyncStorage),
+      });
+      console.log('[Firebase] initializeAuth OK');
+    } catch (e: any) {
+      if (e?.code === 'auth/already-initialized') {
+        firebaseAuth = getAuth(app);
+        console.log('[Firebase] getAuth (already-initialized) OK');
+      } else {
+        firebaseAuth = getAuth(app);
+        console.log('[Firebase] getAuth (fallback) OK');
+      }
+    }
   }
 } catch (e) {
-  console.log('Firebase Auth not available');
+  console.log('[Firebase] Auth init failed completely:', e);
+}
+
+if (!firebaseAuth) {
+  console.error('[Firebase] auth is NULL — login will fail!');
 }
 
 export const auth = firebaseAuth;
 export const storage = null;
 
-// Analytics — initialise seulement si supporte (pas disponible en dev Expo Go)
 let analyticsInstance: any = null;
 isSupported().then(yes => {
   if (yes) analyticsInstance = getAnalytics(app);
