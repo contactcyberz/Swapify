@@ -27,7 +27,6 @@
       "env": {
         "APP_ENV": "production"
       },
-      "npm": { "cmd": "npm install" },
       "android": {
         "buildType": "app-bundle"
       },
